@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -61,7 +62,8 @@ public class DAO {
 		// Une requête SQL paramétrée
 		String sql = "DELETE FROM CUSTOMER WHERE CUSTOMER_ID = ?";
 		try (Connection connection = myDataSource.getConnection();
-			PreparedStatement stmt = connection.prepareStatement(sql)) {
+			PreparedStatement stmt = connection.prepareStatement(sql)
+                        ) {
 			// Définir la valeur du paramètre
 			stmt.setInt(1, customerId);
 
@@ -71,6 +73,7 @@ public class DAO {
 			Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
 			throw new DAOException(ex.getMessage());
 		}
+                
 	}
 
 	/**
@@ -80,7 +83,23 @@ public class DAO {
 	 * @throws DAOException
 	 */
 	public int numberOfOrdersForCustomer(int customerId) throws DAOException {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+            int result = -1;
+
+            String sql ="SELECT COUNT(*) AS NUMBER FROM PURCHASE_ORDER WHERE CUSTOMER_ID=?";
+            try (Connection connection = myDataSource.getConnection(); // Ouvrir une connexion
+			PreparedStatement stmt = connection.prepareStatement(sql); // On crée un statement pour exécuter une requête
+		) {
+                        stmt.setInt(1, customerId);
+                        ResultSet res = stmt.executeQuery();
+			res.next();
+			result = res.getInt("NUMBER");
+
+		} catch (SQLException ex) {
+			Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+			throw new DAOException(ex.getMessage());
+		}
+            return result;
+
 	}
 
 	/**
@@ -91,7 +110,24 @@ public class DAO {
 	 * @throws DAOException
 	 */
 	CustomerEntity findCustomer(int customerID) throws DAOException {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+            String sql ="SELECT CUSTOMER_ID,NAME,ADDRESSLINE1 FROM CUSTOMER WHERE CUSTOMER_ID=?";
+            try (Connection connection = myDataSource.getConnection(); // Ouvrir une connexion
+			PreparedStatement stmt = connection.prepareStatement(sql); // On crée un statement pour exécuter une requête
+		) {
+                        stmt.setInt(1, customerID);
+                        ResultSet res = stmt.executeQuery();
+			if(res.next()){
+                            CustomerEntity cus = new CustomerEntity(customerID, res.getString("NAME"), res.getString("ADDRESSLINE1"));
+                            return cus;
+                        }else{
+                            return null;
+                        }
+
+		} catch (SQLException ex) {
+			Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+			throw new DAOException(ex.getMessage());
+		}
+            
 	}
 
 	/**
@@ -102,7 +138,25 @@ public class DAO {
 	 * @throws DAOException
 	 */
 	List<CustomerEntity> customersInState(String state) throws DAOException {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+            List<CustomerEntity> liste = new ArrayList<>();
+            String sql ="SELECT CUSTOMER_ID,NAME,ADDRESSLINE1 FROM CUSTOMER WHERE STATE=?";
+            try (Connection connection = myDataSource.getConnection(); // Ouvrir une connexion
+			PreparedStatement stmt = connection.prepareStatement(sql); // On crée un statement pour exécuter une requête
+		) {
+                        stmt.setString(1, state);
+                        ResultSet res = stmt.executeQuery();
+                        
+			while(res.next()){
+                            CustomerEntity cus = new CustomerEntity(res.getInt("CUSTOMER_ID"), res.getString("NAME"), res.getString("ADDRESSLINE1"));
+                            liste.add(cus);
+                        }
+
+		} catch (SQLException ex) {
+			Logger.getLogger("DAO").log(Level.SEVERE, null, ex);
+			throw new DAOException(ex.getMessage());
+		}
+            return liste;
+            
 	}
 
 }
