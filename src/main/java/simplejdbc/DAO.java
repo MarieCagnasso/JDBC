@@ -90,6 +90,7 @@ public class DAO {
 			PreparedStatement stmt = connection.prepareStatement(sql); // On crée un statement pour exécuter une requête
 		) {
                         stmt.setInt(1, customerId);
+                         //Ajouter un try 
                         ResultSet res = stmt.executeQuery();
 			res.next();
 			result = res.getInt("NUMBER");
@@ -115,6 +116,7 @@ public class DAO {
 			PreparedStatement stmt = connection.prepareStatement(sql); // On crée un statement pour exécuter une requête
 		) {
                         stmt.setInt(1, customerID);
+                        //Ajouter un try 
                         ResultSet res = stmt.executeQuery();
 			if(res.next()){
                             CustomerEntity cus = new CustomerEntity(customerID, res.getString("NAME"), res.getString("ADDRESSLINE1"));
@@ -144,6 +146,7 @@ public class DAO {
 			PreparedStatement stmt = connection.prepareStatement(sql); // On crée un statement pour exécuter une requête
 		) {
                         stmt.setString(1, state);
+                        //Ajouter un try 
                         ResultSet res = stmt.executeQuery();
                         
 			while(res.next()){
